@@ -30,33 +30,5 @@ export class AuthController {
     return this.appService.getHello()
   
   }
-  // without sevices
-  /*
-  Get /auth/users
-  Get /auth/:id
-  Post /auth
-  patch /users/:id
-  delete /users/:id
-  */
- 
-  @Get()  //  /auth
-  findAll(){
-    return []
-  }
-  @Get(':id')  //  /auth?role=value with query params
-  find(@Query('role') role?:'intern'|'manager'){
-    return [role]
-  }
-  @Get(':id') //  /auth/id  
-  findOne(@Param('id') id:string){
-    return {id}
-  }
-  @Post() //  /auth
-  createOne(@Body() auth:{}){
-    return auth;
-  }
-  @Patch(':id') //  /auth/id  
-  updateOne(@Param('id') id:string, @Body() auth:{}){
-    return {id, auth}
-  }
+  
 }
