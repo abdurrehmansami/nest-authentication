@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UnauthorizedException, Get, Headers, Param, Patch, Query, Delete, ParseIntPipe } from '@nestjs/common';
+import { Controller, Post, Body, UnauthorizedException, Get, Headers, Param, Patch, Query, Delete, ParseIntPipe, ValidationPipe } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -34,11 +34,11 @@ export class UsersController {
     @Post() //  /users;'';;
 
 
-    createOne(@Body() users:CreateUserDto) {
-        return this.userService.create(users);
+    createOne(@Body(ValidationPipe) user:CreateUserDto) {
+        return this.userService.create(user);
     }
     @Patch(':id') //  /users/id  
-    updateOne(@Param('id', ParseIntPipe) id: number, @Body() updatedUser: UpdateUserDto) {
+    updateOne(@Param('id', ParseIntPipe) id: number, @Body(ValidationPipe) updatedUser: UpdateUserDto) {
         return this.userService.updateOne(id,updatedUser)
     }
     @Delete(':id')

@@ -61,7 +61,7 @@ export class UsersService {
         return  removedUser
     }
     
-    create(user:{ name:string,email:string, role:string}){
+    create(user:CreateUserDto){
         let maxNumber = this.users[0].id;
         for (let i = 1; i < this.users.length; i++) {
         if (this.users[i].id > maxNumber) {
@@ -73,11 +73,19 @@ export class UsersService {
         return user;
     }
 
-    updateOne(id:number, updatedUser:{ name:string,email:string, role:string}){
-        const editUserId = id
-        const updated = this.users.map(user=>user.id==id?{id:id,...updatedUser}:user)
-        this.users = updated
-        return {id:editUserId,...updatedUser}
+    // updateOne(id:number, updatedUser:{ name:string,email:string, role:string}){
+    //     const editUserId = id
+    //     const updated = this.users.map(user=>user.id==id?{id:id,...updatedUser}:user)
+    //     this.users = updated
+    //     return {id:editUserId,...updatedUser}
+    // }
+    updateOne(id: number, updatedUser: UpdateUserDto) {
+        const editUserId = id;
+        const updated = this.users.map(user =>
+            user.id == id ? { ...user, ...updatedUser } : user
+        );
+        this.users = updated;
+        return { id: editUserId, ...updatedUser };
     }
 
 }
