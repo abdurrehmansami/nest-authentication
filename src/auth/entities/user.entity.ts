@@ -1,5 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
-
+import { Entity, Column, PrimaryGeneratedColumn, ManyToMany } from 'typeorm';
+import { Department } from '../../department/entities/department.entity';
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
@@ -10,4 +10,7 @@ export class User {
 
   @Column()
   password: string;
+
+  @ManyToMany(() => Department, (department) => department.users)
+  departments: Department[];
 }

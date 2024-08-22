@@ -5,6 +5,7 @@ import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './auth/entities/user.entity';
 import { AuthModule } from './auth/auth.module';
+import { DepartmentModule } from './department/department.module';
 @Module({
  
   imports: [
@@ -19,6 +20,7 @@ import { AuthModule } from './auth/auth.module';
       synchronize: true, // Set to false in production
     }),
     AuthModule,
+    DepartmentModule,
   ],
 })
 export class AppModule {}
