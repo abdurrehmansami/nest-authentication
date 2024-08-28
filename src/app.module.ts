@@ -3,7 +3,7 @@ import { AppController } from './app.controller';
 import { AuthController } from './auth/auth.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from './auth/entities/user.entity';
+import { ProjectModule } from './project/project.module';
 import { AuthModule } from './auth/auth.module';
 import { DepartmentModule } from './department/department.module';
 @Module({
@@ -14,13 +14,14 @@ import { DepartmentModule } from './department/department.module';
       host: 'localhost',
       port: 3306,
       username: 'root',
-      password: 'root',
+      password: '0336',
       database: 'nest_auth',
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: true, // Set to false in production
     }),
     AuthModule,
     DepartmentModule,
+    ProjectModule
   ],
 })
 export class AppModule {}

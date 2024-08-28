@@ -1,5 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable, OneToMany } from 'typeorm';
 import { User } from '../../auth/entities/user.entity';
+import { Project } from '../../project/entities/project.entity';
 import { IsNotEmpty,  } from 'class-validator';
 
 @Entity()
@@ -18,4 +19,9 @@ export class Department {
     inverseJoinColumn: { name: 'user_id', referencedColumnName: 'id' },
   })
   users: User[];
+
+  @OneToMany(()=>Project,(project)=>project.department)
+  projects:Project[]
 }
+
+// one to many me many wale tableme one wale table ki id dal dete hain 
