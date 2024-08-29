@@ -38,31 +38,69 @@ export class DepartmentService {
     });
   }
 
-  async assignUserToDepartment(userId: number, departmentId: number): Promise<void> {
-    const user = await this.userRepository.findOne({
-      where: { id: userId },
-      relations: ['departments'],
-    });
-    // console.log('user', user);
-    if(!user){
-        throw new NotFoundException('User doesnot exist')
-    }
+  // async assignUserToDepartment(userId: number, departmentId: number): Promise<void> {
+  //   const user = await this.userRepository.findOne({
+  //     where: { id: userId },
+  //     relations: ['departments'],
+  //   });
+  //   // console.log('user', user);
+  //   if(!user){
+  //       throw new NotFoundException('User doesnot exist')
+  //   }
     
-    const department = await this.departmentRepository.findOneBy({ id: departmentId });
-    if(!department){
-        throw new NotFoundException('Department doesnot exist')
-    }
-    const userInDept = await this.departmentRepository.findOne({
-      where:{id:department.id},
-      relations:['users']
-    })
-    userInDept.users.forEach(eachUser=>{
-      if(eachUser.id == user.id){
-      throw new ConflictException('This User Already Exist In The Department ')
+  //   const department = await this.departmentRepository.findOneBy({ id: departmentId });
+  //   if(!department){
+  //       throw new NotFoundException('Department doesnot exist')
+  //   }
+  //   const userInDept = await this.departmentRepository.findOne({
+  //     where:{id:department.id},
+  //     relations:['users']
+  //   })
+  //   userInDept.users.forEach(eachUser=>{
+  //     if(eachUser.id == user.id){
+  //     throw new ConflictException('This User Already Exist In The Department ')
+  //     }
+  //   })
+  //   user.departments.push(department);
+  //   await this.userRepository.save(user);
+  // }
+  async assignUserToDepartment(userId: number, departmentId: number): Promise<void> {
+    await this.dataSource.transaction(async manager => {
+      // Fetch the user with departments relation using the transaction manager
+      const user = await manager.findOne(User, {
+        where: { id: userId },
+        relations: ['departments'],
+      });
+
+      if (!user) {
+        throw new NotFoundException('User does not exist');
       }
-    })
-    user.departments.push(department);
-    await this.userRepository.save(user);
+
+      // Fetch the department using the transaction manager
+      const department = await manager.findOne(Department, {
+        where: { id: departmentId },
+      });
+
+      if (!department) {
+        throw new NotFoundException('Department does not exist');
+      }
+
+      // Check if the user is already in the department
+      const userInDept = await manager.findOne(Department, {
+        where: { id: department.id },
+        relations: ['users'],
+      });
+
+      userInDept.users.forEach(eachUser => {
+        if (eachUser.id === user.id) {
+          throw new ConflictException('This User Already Exists In The Department');
+        }
+      });
+
+      // Add the department to the user's departments and save the user
+      user.departments.push(department);
+      await manager.save(user);
+    });
   }
 
   async getDepartments(): Promise<Department[]> {

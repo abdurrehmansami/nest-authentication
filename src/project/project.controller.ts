@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UnauthorizedException, Get, Headers, Param, Patch, Query, ValidationPipe } from '@nestjs/common';
+import { Controller, Post, Body, UnauthorizedException, Get, Headers, Param, Patch, Query, ValidationPipe, ParseIntPipe } from '@nestjs/common';
 import { ProjectService } from './project.service';
 import { CreateDeptDto } from 'src/department/dto/create.dept.dto';
 // import { AuthService } from './auth.service';
@@ -17,10 +17,17 @@ export class ProjectController {
     return project;
   }
 
-  async assignProjectToDept(){}
-  @Get('getHello')
-  async getHello(@Headers() headers){
-    console.log('HEADERS',headers);
+  @Post('/:projectId/department/:departmentId')
+  async assignProjectToDept(
+    @Param('departmentId',ParseIntPipe) departmentId: number,
+    @Param('projectId',ParseIntPipe) projectId:number
+  ){
+    const dept =await this.projectService.assignProjectToDept(departmentId, projectId)
+    return dept;
+  }
+  @Get()
+  async getAllProjects(){
+    return this.projectService.getProjects()
     
     // return this.appService.getHello()
   
