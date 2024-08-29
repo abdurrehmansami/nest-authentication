@@ -1,12 +1,14 @@
 import { Controller, Post, Body, Param, Get, ValidationPipe, ParseIntPipe } from '@nestjs/common';
 import { DepartmentService } from './department.service';
 import { CreateDeptDto } from './dto/create.dept.dto';
+import { Public } from 'src/public.decorator';
 
 @Controller('departments')
 export class DepartmentController {
   constructor(private readonly departmentService: DepartmentService) {}
 
   @Post()
+  @Public()
   async createDepartment(@Body(ValidationPipe) createDeptDto:CreateDeptDto) {
     return this.departmentService.createDepartment(createDeptDto.name);
   }
@@ -20,6 +22,7 @@ export class DepartmentController {
   }
 
   @Get()
+  @Public()
   async getDepartments() {
     return this.departmentService.getDepartments();
   }

@@ -3,6 +3,7 @@ import { AuthService } from './auth.service';
 import { SignupDto } from './dto/signup.dto';
 import { LoginDto } from './dto/login.dto';
 import { AppService } from 'src/app.service';
+import { Public } from 'src/public.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -10,12 +11,14 @@ export class AuthController {
   // constructor(private readonly appService: AppService) {}
 
   @Post('signup')
+  @Public()
   async signup(@Body(ValidationPipe) signupDto: SignupDto) {
     const user = await this.authService.signup(signupDto.email, signupDto.password);
     return user;
   }
 
   @Post('login')
+  @Public()
   async login(@Body(ValidationPipe) loginDto: LoginDto) {
     const user = await this.authService.validateUser(loginDto.email, loginDto.password);
     if (!user) {

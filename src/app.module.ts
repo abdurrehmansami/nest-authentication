@@ -21,7 +21,7 @@ import { DepartmentModule } from './department/department.module';
     }),
     AuthModule,
     DepartmentModule,
-    ProjectModule
+    // ProjectModule
   ],
 })
 export class AppModule {}
