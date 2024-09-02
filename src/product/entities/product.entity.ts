@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, ManyToOne, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, ManyToOne, OneToMany, JoinTable, JoinColumn } from 'typeorm';
 import { User } from 'src/auth/entities/user.entity'; // Assuming you have a User entity
 import { IsNotEmpty, IsNumber, IsPositive } from 'class-validator';
 import { Order } from 'src/order/entities/order.entity';
@@ -21,6 +21,7 @@ export class Product {
   description: string;
 
   @ManyToOne(() => Category, (category) => category.products, { nullable: true })
+  @JoinColumn({name: "category_id"})
   category: Category;
 
   @ManyToMany(() => Deal, (deal) => deal.products, { nullable: true })

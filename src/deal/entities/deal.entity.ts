@@ -8,15 +8,21 @@ export class Deal {
   dealId: number;
 
   @Column()
+  name:string;
+
+  @Column('decimal', { precision: 10, scale: 2 })
+  price: number;
+
+  @Column()
   discount: number;
 
   @ManyToMany(() => Product,(product)=>product.deals)
- @JoinTable({
+  @JoinTable({
     name: 'deal_products', // The name of the join table
     joinColumn: { name: 'deal_id', referencedColumnName: 'dealId' },
     inverseJoinColumn: { name: 'product_id', referencedColumnName: 'id' },
   })
-products:Product[]
+  products:Product[]
   @Column()
   startDate: Date;
 

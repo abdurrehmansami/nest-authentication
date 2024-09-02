@@ -1,10 +1,15 @@
-import { IsNotEmpty, IsNumber, IsDate, ArrayNotEmpty, ArrayMinSize, IsArray } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsDate, ArrayNotEmpty, ArrayMinSize, IsArray, IsOptional, ValidateIf, IsPositive } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class CreateDealDto {
+  @ValidateIf(o => o.discount !== null)
+  @IsOptional()
   @IsNotEmpty()
   @IsNumber()
-  discount: number;
+  discount: number | null;
+
+  @IsNotEmpty()
+  name:string;
 
   @IsNotEmpty()
   @IsDate()
@@ -16,6 +21,10 @@ export class CreateDealDto {
   @Type(() => Date)
   endDate: Date;
 
+  @IsNotEmpty()
+  @IsNumber()
+  @IsPositive()
+  price: number
   @IsArray()
   @ArrayNotEmpty()
   @ArrayMinSize(1)
