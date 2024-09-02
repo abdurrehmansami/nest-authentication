@@ -13,7 +13,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async signup(email: string, password: string): Promise<User> {
+  async signup(email: string, password: string, name:string): Promise<User> {
     const alreadyExist = await this.userRepository.findOne({
       where:{
         email:email
@@ -25,7 +25,7 @@ export class AuthService {
       throw new ConflictException('Email Already Exist')
     }
     const hashedPassword = await bcrypt.hash(password, 10);
-    const user = this.userRepository.create({ email, password: hashedPassword });
+    const user = this.userRepository.create({ email, password: hashedPassword, name, points: 0 });
     return this.userRepository.save(user); 
   }
 

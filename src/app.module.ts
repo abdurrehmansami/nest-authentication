@@ -6,6 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ProjectModule } from './project/project.module';
 import { AuthModule } from './auth/auth.module';
 import { DepartmentModule } from './department/department.module';
+import { ProductModule } from './product/product.module';
 @Module({
  
   imports: [
@@ -15,13 +16,12 @@ import { DepartmentModule } from './department/department.module';
       port: 3306,
       username: 'root',
       password: '0336',
-      database: 'nest_auth',
+      database: 'order_online',
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: true, // Set to false in production
     }),
     AuthModule,
-    DepartmentModule,
-    // ProjectModule
+    ProductModule
   ],
 })
 export class AppModule {}

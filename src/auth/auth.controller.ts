@@ -13,7 +13,7 @@ export class AuthController {
   @Post('signup')
   @Public()
   async signup(@Body(ValidationPipe) signupDto: SignupDto) {
-    const user = await this.authService.signup(signupDto.email, signupDto.password);
+    const user = await this.authService.signup(signupDto.email, signupDto.password, signupDto.name);
     return user;
   }
 
