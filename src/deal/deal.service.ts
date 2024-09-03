@@ -61,8 +61,12 @@ export class DealService {
   
 
   async delete(id:number){
-    await this.dealsRepository.delete({dealId:id})
-    return this.dealsRepository.findBy({dealId:id})
+    const dealToDelete = await this.dealsRepository.findBy({ dealId: id });
+    if (!dealToDelete) {
+        throw new NotFoundException('Deal not found');
+    }
+    await this.dealsRepository.delete({ dealId: id });
+    return dealToDelete;
   }
 
   async getDeals(){
