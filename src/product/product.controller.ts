@@ -14,23 +14,26 @@ export class ProductController {
   }
 
   @Get()
-  findAll() {
-    return this.productService.findAll();
+  async findAll() {
+    const products = await this.productService.findAll();
+    return products;
   }
 
   @Get(':id')
-  findOne(@Param('id',ParseIntPipe) id: number) {
-    return this.productService.findOne(id);
+  async findOne(@Param('id',ParseIntPipe) id: number) {
+    const product = await this.productService.findOne(id);
+    return product;
   }
 
   @Patch(':id')
-  update(@Param('id',ParseIntPipe) id: number, @Body(ValidationPipe) updateProductDto: UpdateProductDto) {
-    return this.productService.update(id, updateProductDto);
+  async update(@Param('id',ParseIntPipe) id: number, @Body(ValidationPipe) updateProductDto: UpdateProductDto) {
+    const updatedProduct = await this.productService.update(id, updateProductDto);
+    return updatedProduct;
   }
 
   @Delete(':id')
-  remove(@Param('id',ParseIntPipe) id: number) {
-    return this.productService.remove(id);
+  async remove(@Param('id',ParseIntPipe) id: number) {
+    return await this.productService.remove(id);
   }
 
   @Get('category/:categoryId')

@@ -18,16 +18,24 @@ export class CategoryService {
 
   async create(createCategoryDto: CreateCategoryDto): Promise<Category>{
     // Fetch products by IDs
+    if(createCategoryDto.productIds){
     const products = await this.productsRepository.findBy({ id: In(createCategoryDto.productIds) });
     if (products.length === 0) {
       throw new NotFoundException('No products found with the provided IDs');
     }
+    
     // Create the category
     const category = this.categoriesRepository.create({
       ...createCategoryDto,
       products: products,  // Associate products with the category
     });
+    
     return this.categoriesRepository.save(category);
+  }
+  else{
+    const category = this.categoriesRepository.create({...createCategoryDto});
+    return this.categoriesRepository.save(category);
+  }
   }
 
   async update(id: number, updateCategoryDto:UpdateCategoryDto){
@@ -41,7 +49,12 @@ export class CategoryService {
     if (!existingCategory) {
       throw new NotFoundException(`Category with ID ${id} not found`);
     }
-  
+    
+    existingCategory.products.forEach(product=>{
+      if(updateCategoryDto.productIds.includes(product.id)){
+        throw new ConflictException("Product already exist in the category.")
+      }
+    })
     // Conditionally update the products relationship
     if (updateCategoryDto.productIds) {
       const products = await this.productsRepository.findBy({ id: In(updateCategoryDto.productIds) });

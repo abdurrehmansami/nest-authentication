@@ -5,7 +5,8 @@ export class CreateCategoryDto {
     @IsNotEmpty()
     name:string;
     
-    
+    // @ValidateIf(o => o.productIds !== null)
+    @IsOptional()
     @IsArray()
     @ArrayNotEmpty()
     @ArrayMinSize(1)

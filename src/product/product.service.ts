@@ -25,11 +25,13 @@ export class ProductService {
   }
 
   async findAll(): Promise<Product[]> {
-    return this.productsRepository.find();
+    const products = await this.productsRepository.find({relations:['category']});
+    return products;
   }
 
   async findOne(id: number): Promise<Product> {
-    return this.productsRepository.findOneBy({ id });
+    const product = await this.productsRepository.findOneBy({ id });
+    return product;
   }
 
   async update(id: number, updateProductDto: UpdateProductDto): Promise<Product> {
@@ -42,14 +44,16 @@ export class ProductService {
   }
 
   async getProductByCategory(categoryId:number): Promise<Product[]> {
-    const productsWithCategories = await this.productsRepository.find({relations:['category'] ,where: {
-    category: Not(null),
+    const productsInCategory = await this.productsRepository.find({relations:['category'] ,where: {
+    category: {
+      categoryId:categoryId
+    },
   },});
-    // const getProductByCategory = productsWithCategories.filter(product=>product.category.categoryId == categoryId)
-    // if(!getProductByCategory){
-    //   throw new NotFoundException("No product of this category exist")
-    // }
-    console.log('PWC',productsWithCategories)
-    return 
+
+  if (productsInCategory.length === 0) {
+    throw new NotFoundException("No products found for this category.");
+  }
+    
+    return productsInCategory;
   }
 }
