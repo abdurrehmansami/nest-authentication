@@ -12,18 +12,15 @@ export class Order {
   @ManyToOne(() => User, user => user.orders)
   user: User;
 
-  @Column('decimal')
-   @IsNotEmpty()
-  @IsNumber()
-  @IsPositive()
+  @Column({type: 'decimal'})
   totalPrice: number;
 
-  @Column({ type: 'varchar', length: 50 })
+  @Column({ type: 'varchar', length: 50, default:"pending" })
   status: string;
 
   @CreateDateColumn()
   createdAt: Date;
 
-  @OneToMany(() => OrderProduct, (orderProduct) => orderProduct.order)
+  @OneToMany(() => OrderProduct, (orderProduct) => orderProduct.order, { cascade: true })
   orderProducts: OrderProduct[];
 }
