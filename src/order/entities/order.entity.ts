@@ -9,7 +9,7 @@ export class Order {
   @PrimaryGeneratedColumn()
   id: number;
   
-  @ManyToOne(() => User, user => user.orders)
+  @ManyToOne(() => User, user => user.orders, { cascade: false })
   user: User;
 
   @Column({type: 'decimal'})

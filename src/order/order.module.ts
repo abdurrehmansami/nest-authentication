@@ -9,10 +9,13 @@ import { Order } from './entities/order.entity';
 import { OrderService } from './order.service';
 import { OrderController } from './order.controller';
 import { OrderProduct } from 'src/orderProduct/entities/orderPrdouct.entity';
+import { User } from 'src/auth/entities/user.entity';
+import { AuthService } from 'src/auth/auth.service';
+import { JwtService } from '@nestjs/jwt';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([ Order ,Product, Category, OrderProduct, Deal])],
-  providers: [ProductService, OrderService],
+  imports: [TypeOrmModule.forFeature([ Order ,Product, Category, OrderProduct, Deal, User])],
+  providers: [ProductService, OrderService, AuthService, JwtService],
   controllers: [OrderController],
 })
 export class OrderModule {}

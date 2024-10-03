@@ -47,4 +47,9 @@ export class AuthService {
   async findAll(){ 
     return this .userRepository.find()
   }
+
+  async findOne(email: string){
+    const user = await this.userRepository.findOneBy({ email });
+    return user
+  }
 }

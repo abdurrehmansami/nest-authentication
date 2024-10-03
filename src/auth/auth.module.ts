@@ -13,10 +13,10 @@ import { AppService } from 'src/app.service';
     TypeOrmModule.forFeature([User]),
     JwtModule.register({
       secret: 'your-secret-key', // Use a more secure secret key in production
-      signOptions: { expiresIn: '1m' }, // Token expires in 60 minutes
+      signOptions: { expiresIn: '10m' }, // Token expires in 60 minutes
     }),
     PassportModule,
-  ],
+  ], 
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy, AppService],
 })
