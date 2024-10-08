@@ -8,10 +8,14 @@ import {
   IsArray,
   ValidateNested,
   IsPositive,
+  IsNotEmpty,
 } from 'class-validator';
+import { PartialType } from '@nestjs/mapped-types';
 import { User } from 'src/auth/entities/user.entity';
 import { Product } from 'src/product/entities/product.entity';
 import { Order } from '../entities/order.entity';
+import { UserDto } from 'src/auth/dto/user.dto';
+import { OrderProduct } from 'src/orderProduct/entities/orderPrdouct.entity';
 
 class OrderProductDto {
   @IsNumber()
@@ -25,6 +29,12 @@ class OrderProductDto {
   @IsNumber()
   @IsPositive()
   price: number;
+
+  constructor(orderProduct: OrderProduct) {
+    this.price = orderProduct.price;
+    this.quantity = orderProduct.quantity;
+    this.productId = orderProduct.product.id;
+  }
 }
 
 export class CreateOrderDto {
@@ -37,6 +47,12 @@ export class CreateOrderDto {
   @IsPositive()
   totalPrice: number;
 
+  @IsNotEmpty()
+  @IsString()
+  pointType: string;
+
+  pointsRedeemed: number | null;
+
   constructor(order: Order) {
     this.totalPrice = order.totalPrice;
     this.orderProducts = order.orderProducts.map((op) => ({
@@ -44,17 +60,25 @@ export class CreateOrderDto {
       price: op.price,
       quantity: op.quantity,
     }));
-    // this.user = employee.user ? new UserDto(employee.user) : null;
-    // this.weeklyHour = employee.weeklyHour;
-    // this.designation = employee?.designation;
-    // this.head = employee.head ? new EmployeeDto(employee.head) : null;
-    // this.workingDays = employee.workingDays;
-    // this.employeeId = employee.employeeId;
-    // this.department = employee.department;
-    // this.employeeType = employee.employeeType?.name;
-    // this.joiningDate = employee.joiningDate;
-    // this.workMode = employee.workMode?.name;
-    // this.skypeId = employee.skypeId;
-    // this.isHead = employee.isHead;
+  }
+}
+export class OrderDto {
+  id: number;
+  status: string;
+  createdAt: Date;
+  totalPrice: number;
+  user: UserDto | null;
+  orderProducts: OrderProductDto[];
+
+  constructor(order: Order) {
+    this.createdAt = order.createdAt;
+    this.id = order.id;
+    this.status = order.status;
+    this.user = order.user ? new UserDto(order.user) : null;
+    this.totalPrice = order.totalPrice;
+    // Map over the orderProducts array to convert each to OrderProductDto
+    this.orderProducts = order.orderProducts.map(
+      (orderProduct) => new OrderProductDto(orderProduct),
+    );
   }
 }

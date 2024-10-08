@@ -12,9 +12,20 @@ import { OrderProduct } from 'src/orderProduct/entities/orderPrdouct.entity';
 import { User } from 'src/auth/entities/user.entity';
 import { AuthService } from 'src/auth/auth.service';
 import { JwtService } from '@nestjs/jwt';
+import { PointHistory } from 'src/pointsHistory/entities/pointHistory.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([ Order ,Product, Category, OrderProduct, Deal, User])],
+  imports: [
+    TypeOrmModule.forFeature([
+      Order,
+      Product,
+      Category,
+      OrderProduct,
+      Deal,
+      User,
+      PointHistory,
+    ]),
+  ],
   providers: [ProductService, OrderService, AuthService, JwtService],
   controllers: [OrderController],
 })

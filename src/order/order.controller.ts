@@ -1,4 +1,14 @@
-import { Controller, Post, Body, Param, Get, ValidationPipe, ParseIntPipe, UseGuards, Req } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Param,
+  Get,
+  ValidationPipe,
+  ParseIntPipe,
+  UseGuards,
+  Req,
+} from '@nestjs/common';
 import { Order } from './entities/order.entity';
 import { OrderService } from './order.service';
 import { CreateOrderDto } from './dto/create-order.dto';
@@ -10,28 +20,32 @@ export interface AuthenticatedRequest extends Request {
 }
 @Controller('orders')
 export class OrderController {
-
-constructor(private readonly orderService:OrderService,private readonly userService:AuthService){}
-
+  constructor(
+    private readonly orderService: OrderService,
+    private readonly userService: AuthService,
+  ) {}
 
   // @Post()
   // async createOrder(@Body() createOrderDto: CreateOrderDto) {
   //   return await this.orderService.createOrder(createOrderDto);
   // }
-    // Protected route for authenticated users
-    @UseGuards(JwtAuthGuard)
-    @Post('user')
-    async createOrderAsUser(@Body() createOrderDto: CreateOrderDto, @Req() req: AuthenticatedRequest) {
-      // const user = req.user;  // Extract user info from request
-      const user = await this.userService.findOne(req.user.email)
-      return await this.orderService.createOrder(createOrderDto, user);
-    }
-  
-    // Public route for guests
-    @Post('guest')
-    async createOrderAsGuest(@Body() createOrderDto: CreateOrderDto) {
-      return await this.orderService.createOrder(createOrderDto, null);
-    }
+  // Protected route for authenticated users
+  @UseGuards(JwtAuthGuard)
+  @Post('user')
+  async createOrderAsUser(
+    @Body() createOrderDto: CreateOrderDto,
+    @Req() req: AuthenticatedRequest,
+  ) {
+    // const user = req.user;  // Extract user info from request
+    const user = await this.userService.findOne(req.user.email);
+    console.log('uswr', user);
 
+    return await this.orderService.createOrder(createOrderDto, user);
+  }
+
+  // Public route for guests
+  @Post('guest')
+  async createOrderAsGuest(@Body() createOrderDto: CreateOrderDto) {
+    return await this.orderService.createOrder(createOrderDto, null);
+  }
 }
-
