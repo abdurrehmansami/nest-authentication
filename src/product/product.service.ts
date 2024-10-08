@@ -6,7 +6,7 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { Category } from '../category/entities/category.entity';
 import { Deal } from 'src/deal/entities/deal.entity';
-import { log } from 'console';
+import { Public } from 'src/public.decorator';
 
 @Injectable()
 export class ProductService {
@@ -25,7 +25,9 @@ export class ProductService {
   }
 
   async findAll(): Promise<Product[]> {
-    const products = await this.productsRepository.find({relations:['category']});
+    const products = await this.productsRepository.find({
+      relations: ['category', 'deals'],
+    });
     return products;
   }
 
@@ -34,7 +36,10 @@ export class ProductService {
     return product;
   }
 
-  async update(id: number, updateProductDto: UpdateProductDto): Promise<Product> {
+  async update(
+    id: number,
+    updateProductDto: UpdateProductDto,
+  ): Promise<Product> {
     await this.productsRepository.update(id, updateProductDto);
     return this.productsRepository.findOneBy({ id });
   }
@@ -43,17 +48,20 @@ export class ProductService {
     await this.productsRepository.delete(id);
   }
 
-  async getProductByCategory(categoryId:number): Promise<Product[]> {
-    const productsInCategory = await this.productsRepository.find({relations:['category'] ,where: {
-    category: {
-      categoryId:categoryId
-    },
-  },});
+  async getProductByCategory(categoryId: number): Promise<Product[]> {
+    const productsInCategory = await this.productsRepository.find({
+      relations: ['category'],
+      where: {
+        category: {
+          categoryId: categoryId,
+        },
+      },
+    });
 
-  if (productsInCategory.length === 0) {
-    throw new NotFoundException("No products found for this category.");
-  }
-    
+    if (productsInCategory.length === 0) {
+      throw new NotFoundException('No products found for this category.');
+    }
+
     return productsInCategory;
   }
 }

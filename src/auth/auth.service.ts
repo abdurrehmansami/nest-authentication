@@ -13,20 +13,25 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async signup(email: string, password: string, name:string): Promise<User> {
+  async signup(email: string, password: string, name: string): Promise<User> {
     const alreadyExist = await this.userRepository.findOne({
-      where:{
-        email:email
-      }
-    })
-    console.log('EXIST',alreadyExist);
-    
-    if(alreadyExist){
-      throw new ConflictException('Email Already Exist')
+      where: {
+        email: email,
+      },
+    });
+    console.log('EXIST', alreadyExist);
+
+    if (alreadyExist) {
+      throw new ConflictException('Email Already Exist');
     }
     const hashedPassword = await bcrypt.hash(password, 10);
-    const user = this.userRepository.create({ email, password: hashedPassword, name, points: 0 });
-    return this.userRepository.save(user); 
+    const user = this.userRepository.create({
+      email,
+      password: hashedPassword,
+      name,
+      points: 0,
+    });
+    return this.userRepository.save(user);
   }
 
   async validateUser(email: string, password: string): Promise<User | null> {
@@ -38,18 +43,20 @@ export class AuthService {
   }
 
   async login(user: User) {
-    const payload = { email: user.email, sub: user.id };
+    const payload = { email: user.email, sub: user.id, role: user.role };
+    console.log('payload', payload);
+
     return {
       access_token: this.jwtService.sign(payload),
     };
   }
 
-  async findAll(){ 
-    return this .userRepository.find()
+  async findAll() {
+    return this.userRepository.find();
   }
 
-  async findOne(email: string){
+  async findOne(email: string) {
     const user = await this.userRepository.findOneBy({ email });
-    return user
+    return user;
   }
 }

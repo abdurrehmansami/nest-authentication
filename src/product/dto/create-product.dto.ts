@@ -1,4 +1,11 @@
-import { IsString, IsNumber, IsOptional, IsUrl, ValidateIf } from 'class-validator';
+import {
+  IsString,
+  IsNumber,
+  IsOptional,
+  IsUrl,
+  ValidateIf,
+} from 'class-validator';
+import { PartialType } from '@nestjs/mapped-types';
 
 export class CreateProductDto {
   @IsString()
@@ -15,7 +22,11 @@ export class CreateProductDto {
   @IsUrl()
   imageUrl?: string;
 
-  @ValidateIf(o => o.categoryId !== null)
+  @ValidateIf((o) => o.categoryId !== null)
   @IsNumber()
   categoryId: number | null;
+}
+
+export class ProductDto extends PartialType(CreateProductDto) {
+  id: number;
 }

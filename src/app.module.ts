@@ -1,17 +1,14 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AuthController } from './auth/auth.controller';
-import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ProjectModule } from './project/project.module';
 import { AuthModule } from './auth/auth.module';
-import { DepartmentModule } from './department/department.module';
 import { ProductModule } from './product/product.module';
 import { DealModule } from './deal/deal.module';
 import { CategoryModule } from './category/category.module';
 import { OrderModule } from './order/order.module';
+import { APP_GUARD } from '@nestjs/core';
+import { RolesGuard } from './role.user.guard';
+import { JwtAuthGuard } from './jwt-auth.guard';
 @Module({
- 
   imports: [
     TypeOrmModule.forRoot({
       type: 'mysql',
@@ -27,7 +24,11 @@ import { OrderModule } from './order/order.module';
     ProductModule,
     DealModule,
     CategoryModule,
-    OrderModule
+    OrderModule,
+  ],
+  providers: [
+    { provide: APP_GUARD, useClass: JwtAuthGuard },
+    { provide: APP_GUARD, useClass: RolesGuard },
   ],
 })
 export class AppModule {}
