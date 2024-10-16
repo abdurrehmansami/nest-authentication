@@ -1,0 +1,30 @@
+Yes, when you apply the @Roles decorator to any endpoint, the RolesGuard comes into play to determine whether the user has the appropriate role (like admin or user) to access that endpoint. Here's how it works, step by step, after you log in:
+
+1. Login Process and JWT Token Generation
+After the user logs in, a JWT (JSON Web Token) is generated, which contains the user's information (including their role, e.g., admin or user).
+
+For example, in your authentication service, when a user logs in, you might include their role in the JWT payload like this:
+
+// Example JWT payload generation
+async login(user: any) {
+  const payload = { username: user.username, sub: user.userId, role: user.role }; // Include role here
+  return {
+    access_token: this.jwtService.sign(payload),
+  };
+}
+
+This JWT token is then sent back to the client (e.g., a React/Angular app) upon successful login. The client will store this token (in localStorage, sessionStorage, or memory) and send it in the Authorization header with every request.
+2. JWT Guard
+For every request that requires authentication, the JWT Guard (e.g., JwtAuthGuard) will extract the token from the request's Authorization header, decode it, and make the user's details (including their role) available in the request object.
+
+The JwtAuthGuard decodes the token and attaches the user's information (like userId and role) to the request object, allowing your application to understand which user is making the request.
+
+3. How RolesGuard Works
+After the JwtAuthGuard successfully validates the user's token, the RolesGuard will come into play. It will check the metadata set by the @Roles decorator on the endpoint and verify if the logged-in user has the required role.
+Here’s how the flow works:
+
+Token Decoding: The JwtAuthGuard validates the JWT token and attaches the decoded payload (which includes the role) to the request object.
+
+Metadata Check: The RolesGuard retrieves the roles defined on the endpoint using @Roles(). It does this by reading the roles metadata from the controller method where @Roles is applied.
+
+Role Comparison: The RolesGuard then compares the role from the JWT (attached to the request) with the required roles for that endpoint. If they match, the request is allowed to proceed; otherwise, the user gets a 403 Forbidden error.

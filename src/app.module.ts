@@ -5,9 +5,10 @@ import { ProductModule } from './product/product.module';
 import { DealModule } from './deal/deal.module';
 import { CategoryModule } from './category/category.module';
 import { OrderModule } from './order/order.module';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from './role.user.guard';
 import { JwtAuthGuard } from './jwt-auth.guard';
+import { AllExceptionsFilter } from './exception/http-exception.filter';
 @Module({
   imports: [
     TypeOrmModule.forRoot({
@@ -29,6 +30,10 @@ import { JwtAuthGuard } from './jwt-auth.guard';
   providers: [
     { provide: APP_GUARD, useClass: JwtAuthGuard },
     { provide: APP_GUARD, useClass: RolesGuard },
+    {
+      provide: APP_FILTER,
+      useClass: AllExceptionsFilter,
+    },
   ],
 })
 export class AppModule {}
