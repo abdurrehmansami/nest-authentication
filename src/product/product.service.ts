@@ -53,7 +53,7 @@ export class ProductService {
       relations: ['category'],
       where: {
         category: {
-          categoryId: categoryId,
+          id: categoryId,
         },
       },
     });

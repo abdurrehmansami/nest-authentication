@@ -12,7 +12,7 @@ import { User } from 'src/auth/entities/user.entity';
 @Entity()
 export class PointHistory {
   @PrimaryGeneratedColumn()
-  pointId: number;
+  id: number;
   @ManyToOne(() => User, (user) => user.points)
   @JoinColumn({ name: 'userId' })
   user: User;

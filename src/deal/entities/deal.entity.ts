@@ -1,14 +1,21 @@
 import { Product } from 'src/product/entities/product.entity';
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany, ManyToMany, JoinTable } from 'typeorm';
-
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  OneToMany,
+  ManyToMany,
+  JoinTable,
+} from 'typeorm';
 
 @Entity()
 export class Deal {
   @PrimaryGeneratedColumn()
-  dealId: number;
+  id: number;
 
   @Column()
-  name:string;
+  name: string;
 
   @Column('decimal', { precision: 10, scale: 2 })
   price: number;
@@ -16,17 +23,16 @@ export class Deal {
   @Column()
   discount: number;
 
-  @ManyToMany(() => Product,(product)=>product.deals)
+  @ManyToMany(() => Product, (product) => product.deals)
   @JoinTable({
     name: 'deal_products', // The name of the join table
-    joinColumn: { name: 'deal_id', referencedColumnName: 'dealId' },
+    joinColumn: { name: 'deal_id', referencedColumnName: 'id' },
     inverseJoinColumn: { name: 'product_id', referencedColumnName: 'id' },
   })
-  products:Product[]
+  products: Product[];
   @Column()
   startDate: Date;
 
   @Column()
   endDate: Date;
 }
-

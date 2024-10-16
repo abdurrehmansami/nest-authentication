@@ -1,5 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import * as cookieParser from 'cookie-parser';
 import { AuthGuard } from '@nestjs/passport';
 import { Reflector } from '@nestjs/core';
 import { JwtAuthGuard } from './jwt-auth.guard';
@@ -13,6 +14,7 @@ import { JwtAuthGuard } from './jwt-auth.guard';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.enableCors(); // Enable CORS if needed
+  app.use(cookieParser());
   app.setGlobalPrefix('api/v1');
   await app.listen(3001);
 }
