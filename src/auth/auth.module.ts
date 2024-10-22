@@ -14,7 +14,7 @@ import { Product } from 'src/product/entities/product.entity';
     TypeOrmModule.forFeature([User, Product]),
     JwtModule.register({
       secret: 'your-secret-key', // Use a more secure secret key in production
-      signOptions: { expiresIn: '10m' }, // Token expires in 60 minutes
+      signOptions: { expiresIn: '10s' }, // Token expires in 60 minutes
     }),
     PassportModule,
   ],

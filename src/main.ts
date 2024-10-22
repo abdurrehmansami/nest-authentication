@@ -13,7 +13,10 @@ import { JwtAuthGuard } from './jwt-auth.guard';
 // bootstrap();
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.enableCors(); // Enable CORS if needed
+  app.enableCors({
+    origin: 'http://localhost:5173', // or '*' for all domains
+    credentials: true,
+  }); // Enable CORS if needed
   app.use(cookieParser());
   app.setGlobalPrefix('api/v1');
   await app.listen(3001);

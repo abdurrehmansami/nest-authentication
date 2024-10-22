@@ -37,9 +37,8 @@ export class AuthController {
     );
     return user;
   }
-
-  @Post('login')
   @Public()
+  @Post('login')
   async login(@Body(ValidationPipe) loginDto: LoginDto, @Res() res: Response) {
     const user = await this.authService.validateUser(
       loginDto.email,
@@ -48,21 +47,20 @@ export class AuthController {
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
     }
-    const token = await this.authService.login(user);
+    const token = (await this.authService.login(user)).access_token;
     // Set token in HTTP-only cookie
     res.cookie('jwt', token, {
       httpOnly: true,
       // secure: process.env.NODE_ENV === 'production', // Only use 'secure' in production
-      sameSite: 'strict', // Prevent CSRF
-      maxAge: 24 * 60 * 60 * 1000, // 1 day expiration
+      // secure: false, // set to true in production over HTTPS
+      // sameSite: 'none', // Prevent CSRF
+      maxAge: 1 * 60000, //24 * 60 * 60 * 1000, // 1 day expiration
     });
     // Respond with success status
-    return res
-      .status(HttpStatus.OK)
-      .json({
-        message: 'Logged in successfully',
-        data: { email: user.email, name: user.name },
-      });
+    return res.status(HttpStatus.OK).json({
+      message: 'Logged in successfully',
+      data: { email: user.email, name: user.name },
+    });
   }
   @Get('getHello')
   async getHello(@Headers() headers) {

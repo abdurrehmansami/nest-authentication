@@ -24,8 +24,8 @@ export class ProductController {
     const createdProduct = await this.productService.create(createProductDto);
     return createdProduct;
   }
-  @Roles(UserRole.ADMIN)
   @Get()
+  @Roles(UserRole.ADMIN)
   async findAll() {
     const products = await this.productService.findAll();
     return products;
