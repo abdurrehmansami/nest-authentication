@@ -1,15 +1,26 @@
-import { IsNotEmpty, IsNumber, IsDate, ArrayNotEmpty, ArrayMinSize, IsArray, IsOptional, ValidateIf, IsPositive } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsNumber,
+  IsDate,
+  ArrayNotEmpty,
+  ArrayMinSize,
+  IsArray,
+  IsOptional,
+  ValidateIf,
+  IsPositive,
+} from 'class-validator';
 import { Type } from 'class-transformer';
+import { Optional } from '@nestjs/common';
 
 export class CreateDealDto {
-  @ValidateIf(o => o.discount !== null)
+  @ValidateIf((o) => o.discount !== null)
   @IsOptional()
   @IsNotEmpty()
   @IsNumber()
   discount: number | null;
 
   @IsNotEmpty()
-  name:string;
+  name: string;
 
   @IsNotEmpty()
   @IsDate()
@@ -20,14 +31,14 @@ export class CreateDealDto {
   @IsDate()
   @Type(() => Date)
   endDate: Date;
-
+  @IsOptional()
   @IsNotEmpty()
   @IsNumber()
   @IsPositive()
-  price: number
+  price: number;
   @IsArray()
   @ArrayNotEmpty()
   @ArrayMinSize(1)
   @IsNumber({}, { each: true })
-  productIds: number[];  // Array of product IDs to associate with the deal
+  productIds: number[]; // Array of product IDs to associate with the deal
 }
