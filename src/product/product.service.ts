@@ -22,6 +22,7 @@ export class ProductService {
   async create(createProductDto: CreateProductDto): Promise<Product> {
     const queryRunner =
       this.productsRepository.manager.connection.createQueryRunner();
+    await queryRunner.startTransaction();
     try {
       await queryRunner.startTransaction();
       const product = queryRunner.manager.create(Product, createProductDto);
@@ -77,9 +78,11 @@ export class ProductService {
   ): Promise<Product> {
     const queryRunner =
       this.productsRepository.manager.connection.createQueryRunner();
+    await queryRunner.startTransaction();
     try {
       await queryRunner.manager.update(Product, id, updateProductDto);
       const updatedProduct = queryRunner.manager.findOneBy(Product, { id });
+      await queryRunner.commitTransaction();
       return updatedProduct;
     } catch (err) {
       await queryRunner.rollbackTransaction();
@@ -90,12 +93,14 @@ export class ProductService {
   async remove(id: number): Promise<Product> {
     const queryRunner =
       this.productsRepository.manager.connection.createQueryRunner();
+    await queryRunner.startTransaction();
     try {
       const product = await queryRunner.manager.findOneBy(Product, { id });
       if (!product) throw new NotFoundException('Product not found');
 
       product.isActive = false;
       const inActiveProduct = await queryRunner.manager.save(product);
+      await queryRunner.commitTransaction();
       return inActiveProduct;
     } catch (err) {
       await queryRunner.rollbackTransaction();

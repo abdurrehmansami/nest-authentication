@@ -20,65 +20,99 @@ export class CategoryService {
   ) {}
 
   async create(createCategoryDto: CreateCategoryDto): Promise<Category> {
-    // Fetch products by IDs
-    if (createCategoryDto.productIds) {
-      const products = await this.productsRepository.findBy({
-        id: In(createCategoryDto.productIds),
-      });
-      if (products.length === 0) {
-        throw new NotFoundException('No products found with the provided IDs');
+    const queryRunner =
+      this.categoriesRepository.manager.connection.createQueryRunner();
+    queryRunner.startTransaction();
+    try {
+      // Fetch products by IDs
+      if (createCategoryDto.productIds) {
+        const products = await queryRunner.manager.findBy(Product, {
+          id: In(createCategoryDto.productIds),
+        });
+        if (products.length === 0) {
+          throw new NotFoundException(
+            'No products found with the provided IDs',
+          );
+        }
+
+        // Create the category
+        const category = queryRunner.manager.create(Category, {
+          ...createCategoryDto,
+          products: products, // Associate products with the category
+        });
+
+        return queryRunner.manager.save(category);
+      } else {
+        const category = queryRunner.manager.create(Category, {
+          ...createCategoryDto,
+        });
+        const savedProduct = await queryRunner.manager.save(category);
+        await queryRunner.commitTransaction();
+        return savedProduct;
       }
-
-      // Create the category
-      const category = this.categoriesRepository.create({
-        ...createCategoryDto,
-        products: products, // Associate products with the category
-      });
-
-      return this.categoriesRepository.save(category);
-    } else {
-      const category = this.categoriesRepository.create({
-        ...createCategoryDto,
-      });
-      return this.categoriesRepository.save(category);
+    } catch (err) {
+      await queryRunner.rollbackTransaction();
+      throw err;
     }
   }
 
   async update(id: number, updateCategoryDto: UpdateCategoryDto) {
-    // Find the existing category by its ID
-    const existingCategory = await this.categoriesRepository.findOne({
-      where: { id: id },
-      relations: ['products'], // Load related products
-    });
-
-    if (!existingCategory) {
-      throw new NotFoundException(`Category with ID ${id} not found`);
-    }
-
-    existingCategory.products.forEach((product) => {
-      if (updateCategoryDto.productIds.includes(product.id)) {
-        throw new ConflictException('Product already exist in the category.');
-      }
-    });
-    // Conditionally update the products relationship
-    if (updateCategoryDto.productIds) {
-      const products = await this.productsRepository.findBy({
-        id: In(updateCategoryDto.productIds),
+    const queryRunner =
+      this.categoriesRepository.manager.connection.createQueryRunner();
+    queryRunner.startTransaction();
+    try {
+      // Find the existing category by its ID
+      const existingCategory = await queryRunner.manager.findOne(Category, {
+        where: { id },
+        relations: ['products'], // Load related products
       });
 
-      if (products.length === 0) {
-        throw new NotFoundException('No products found with the provided IDs');
+      if (!existingCategory) {
+        throw new NotFoundException(`Category with ID ${id} not found`);
       }
 
-      // Update the products association
-      existingCategory.products = products;
+      // Conditionally update the products relationship
+      if (updateCategoryDto.productIds.length) {
+        const products = await queryRunner.manager.find(Product, {
+          where: { id: In(updateCategoryDto.productIds) },
+          relations: ['category'],
+        });
+
+        products.forEach((product) => {
+          console.log(product);
+          if (product?.category !== null && product?.category?.id !== id) {
+            throw new ConflictException(
+              `Product ${product.name} already exist in another category`,
+            );
+          }
+        });
+
+        if (!products.length) {
+          throw new NotFoundException(
+            'No products found with the provided IDs',
+          );
+        }
+
+        // Update the products association
+        existingCategory.products = products;
+      } else if (updateCategoryDto.productIds.length == 0) {
+        existingCategory.products = [];
+      }
+      // Update other properties using the merge method
+      queryRunner.manager.merge(Category, existingCategory, updateCategoryDto);
+
+      // Save the updated deal
+      const savedCategory = queryRunner.manager.save(existingCategory);
+      (await savedCategory).products.forEach(
+        (product) => delete product.category,
+      );
+      await queryRunner.commitTransaction();
+      return savedCategory;
+    } catch (err) {
+      console.error(err);
+      await queryRunner.rollbackTransaction();
+      throw err;
     }
-
-    // Update other properties using the merge method
-    this.categoriesRepository.merge(existingCategory, updateCategoryDto);
-
-    // Save the updated deal
-    return this.categoriesRepository.save(existingCategory);
   }
 
   async getCategories() {
@@ -97,11 +131,20 @@ export class CategoryService {
   }
 
   async delete(id: number) {
-    const categoryToDelete = await this.categoriesRepository.findBy({ id: id });
-    if (!categoryToDelete) {
-      throw new NotFoundException('Deal not found');
+    const queryRunner =
+      this.categoriesRepository.manager.connection.createQueryRunner();
+    queryRunner.startTransaction();
+    try {
+      const result = await queryRunner.manager.delete(Category, { id });
+      if (result.affected == 0) {
+        throw new NotFoundException('Category not found');
+      }
+      await queryRunner.commitTransaction();
+    } catch (err) {
+      // console.log('err', err);
+
+      await queryRunner.rollbackTransaction();
+      throw err;
     }
-    await this.categoriesRepository.delete({ id: id });
-    return categoryToDelete;
   }
 }
