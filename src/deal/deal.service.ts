@@ -95,9 +95,18 @@ export class DealService {
   }
 
   async delete(id: number): Promise<void> {
-    const result = await this.dealsRepository.delete(id);
-    if (result.affected === 0) {
-      throw new NotFoundException('Deal not found');
+    const queryRunner =
+      this.dealsRepository.manager.connection.createQueryRunner();
+    await queryRunner.startTransaction();
+    try {
+      const result = await queryRunner.manager.delete(Deal, id);
+      if (result.affected === 0) {
+        throw new NotFoundException('Deal not found');
+      }
+      await queryRunner.commitTransaction();
+    } catch (err) {
+      await queryRunner.rollbackTransaction();
+      throw err;
     }
   }
 
