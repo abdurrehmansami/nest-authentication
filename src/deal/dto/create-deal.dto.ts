@@ -13,11 +13,11 @@ import { Type } from 'class-transformer';
 import { Optional } from '@nestjs/common';
 
 export class CreateDealDto {
-  @ValidateIf((o) => o.discount !== null)
-  @IsOptional()
-  @IsNotEmpty()
-  @IsNumber()
-  discount: number | null;
+  // @ValidateIf((o) => o.discount !== null)
+  // @IsOptional()
+  // @IsNotEmpty()
+  // @IsNumber()
+  // discount: number | null;
 
   @IsNotEmpty()
   name: string;

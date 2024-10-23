@@ -54,7 +54,7 @@ export class AuthController {
       // secure: process.env.NODE_ENV === 'production', // Only use 'secure' in production
       // secure: false, // set to true in production over HTTPS
       // sameSite: 'none', // Prevent CSRF
-      maxAge: 1 * 60000, //24 * 60 * 60 * 1000, // 1 day expiration
+      maxAge: 5 * 60000, //24 * 60 * 60 * 1000, // 1 day expiration
     });
     // Respond with success status
     return res.status(HttpStatus.OK).json({

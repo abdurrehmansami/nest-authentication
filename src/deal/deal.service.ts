@@ -31,20 +31,24 @@ export class DealService {
       if (products.length === 0) {
         throw new NotFoundException('No products found with the provided IDs');
       }
-      // let dealPrice = 0;
-      // products.forEach((product) => (dealPrice += Number(product.price)));
+      let dealPrice = 0;
+      products.forEach((product) => (dealPrice += Number(product.price)));
 
       // Create the deal
       const deal = queryRunner.manager.create(Deal, {
         ...createDealDto,
         // price: dealPrice,
+        discount: ((dealPrice - createDealDto.price) / dealPrice) * 100,
         products: products, // Associate products with the deal
       });
       // const deal = this.dealsRepository.create(createDealDto);
       const savedDeal = await queryRunner.manager.save(Deal, deal);
+
       await queryRunner.commitTransaction();
       return savedDeal;
     } catch (err) {
+      console.log(err);
+
       await queryRunner.rollbackTransaction();
       throw err;
     }
