@@ -20,24 +20,27 @@ import { Public } from 'src/public.decorator';
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
   @Post()
+  @Roles(UserRole.ADMIN)
   async create(@Body(ValidationPipe) createProductDto: CreateProductDto) {
     const createdProduct = await this.productService.create(createProductDto);
     return createdProduct;
   }
   @Get()
-  @Roles(UserRole.ADMIN)
+  @Public()
   async findAll() {
     const products = await this.productService.findAll();
     return products;
   }
 
   @Get(':id')
+  @Public()
   async findOne(@Param('id', ParseIntPipe) id: number) {
     const product = await this.productService.findOne(id);
     return product;
   }
 
   @Patch(':id')
+  @Roles(UserRole.ADMIN)
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body(ValidationPipe) updateProductDto: UpdateProductDto,
@@ -50,6 +53,7 @@ export class ProductController {
   }
 
   @Delete(':id')
+  @Roles(UserRole.ADMIN)
   async remove(@Param('id', ParseIntPipe) id: number) {
     return await this.productService.remove(id);
   }

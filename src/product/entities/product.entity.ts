@@ -1,4 +1,13 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, ManyToOne, OneToMany, JoinTable, JoinColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToMany,
+  ManyToOne,
+  OneToMany,
+  JoinTable,
+  JoinColumn,
+} from 'typeorm';
 import { User } from 'src/auth/entities/user.entity'; // Assuming you have a User entity
 import { IsNotEmpty, IsNumber, IsPositive } from 'class-validator';
 import { Order } from 'src/order/entities/order.entity';
@@ -10,7 +19,7 @@ import { Deal } from 'src/deal/entities/deal.entity';
 export class Product {
   @PrimaryGeneratedColumn()
   id: number;
- 
+
   @Column()
   name: string;
 
@@ -20,13 +29,20 @@ export class Product {
   @Column('text', { nullable: true })
   description: string;
 
-  @ManyToOne(() => Category, (category) => category.products, { nullable: true })
-  @JoinColumn({name: "category_id"})
+  @ManyToOne(() => Category, (category) => category.products, {
+    nullable: true,
+  })
+  @JoinColumn({ name: 'category_id' })
   category: Category;
+
+  @Column({ default: true })
+  isActive: boolean;
 
   @ManyToMany(() => Deal, (deal) => deal.products, { nullable: true })
   deals: Deal[];
 
-  @OneToMany(() => OrderProduct, (orderProduct) => orderProduct.product)
+  @OneToMany(() => OrderProduct, (orderProduct) => orderProduct.product, {
+    cascade: true,
+  })
   orderProducts: OrderProduct[];
 }

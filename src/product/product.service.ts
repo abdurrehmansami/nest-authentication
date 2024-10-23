@@ -20,13 +20,48 @@ export class ProductService {
   ) {}
 
   async create(createProductDto: CreateProductDto): Promise<Product> {
-    const product = this.productsRepository.create(createProductDto);
-    return this.productsRepository.save(product);
+    const queryRunner =
+      this.productsRepository.manager.connection.createQueryRunner();
+    try {
+      await queryRunner.startTransaction();
+      const product = queryRunner.manager.create(Product, createProductDto);
+      const category = await queryRunner.manager.findOne(Category, {
+        where: { id: createProductDto.categoryId },
+      });
+      if (!category) {
+        throw new NotFoundException('Category doesnot exist');
+      }
+      console.log(category);
+
+      // category.products.push(product);
+      // await queryRunner.manager.save(Category, category);
+      product.category = category;
+
+      const savedProduct = await queryRunner.manager.save(Product, product);
+      await queryRunner.commitTransaction();
+      return savedProduct;
+    } catch (err) {
+      console.log(err);
+
+      await queryRunner.rollbackTransaction();
+      throw err;
+    }
   }
 
   async findAll(): Promise<Product[]> {
     const products = await this.productsRepository.find({
       relations: ['category', 'deals'],
+      select: {
+        id: true,
+        name: true,
+        isActive: true,
+        price: true,
+        description: true,
+        deals: {
+          id: true,
+          name: true,
+        },
+      },
     });
     return products;
   }
@@ -40,12 +75,32 @@ export class ProductService {
     id: number,
     updateProductDto: UpdateProductDto,
   ): Promise<Product> {
-    await this.productsRepository.update(id, updateProductDto);
-    return this.productsRepository.findOneBy({ id });
+    const queryRunner =
+      this.productsRepository.manager.connection.createQueryRunner();
+    try {
+      await queryRunner.manager.update(Product, id, updateProductDto);
+      const updatedProduct = queryRunner.manager.findOneBy(Product, { id });
+      return updatedProduct;
+    } catch (err) {
+      await queryRunner.rollbackTransaction();
+      throw err;
+    }
   }
 
-  async remove(id: number): Promise<void> {
-    await this.productsRepository.delete(id);
+  async remove(id: number): Promise<Product> {
+    const queryRunner =
+      this.productsRepository.manager.connection.createQueryRunner();
+    try {
+      const product = await queryRunner.manager.findOneBy(Product, { id });
+      if (!product) throw new NotFoundException('Product not found');
+
+      product.isActive = false;
+      const inActiveProduct = await queryRunner.manager.save(product);
+      return inActiveProduct;
+    } catch (err) {
+      await queryRunner.rollbackTransaction();
+      throw err;
+    }
   }
 
   async getProductByCategory(categoryId: number): Promise<Product[]> {
