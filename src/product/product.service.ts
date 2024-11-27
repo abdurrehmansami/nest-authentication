@@ -24,20 +24,20 @@ export class ProductService {
       this.productsRepository.manager.connection.createQueryRunner();
     await queryRunner.startTransaction();
     try {
-      await queryRunner.startTransaction();
       const product = queryRunner.manager.create(Product, createProductDto);
-      const category = await queryRunner.manager.findOne(Category, {
-        where: { id: createProductDto.categoryId },
-      });
-      if (!category) {
-        throw new NotFoundException('Category doesnot exist');
+      if (createProductDto.categoryId) {
+        const category = await queryRunner.manager.findOne(Category, {
+          where: { id: createProductDto.categoryId },
+        });
+        if (!category) {
+          throw new NotFoundException('Category doesnot exist');
+        }
+        // console.log(category);
+
+        // category.products.push(product);
+        // await queryRunner.manager.save(Category, category);
+        product.category = category;
       }
-      console.log(category);
-
-      // category.products.push(product);
-      // await queryRunner.manager.save(Category, category);
-      product.category = category;
-
       const savedProduct = await queryRunner.manager.save(Product, product);
       await queryRunner.commitTransaction();
       return savedProduct;
@@ -81,10 +81,16 @@ export class ProductService {
     await queryRunner.startTransaction();
     try {
       await queryRunner.manager.update(Product, id, updateProductDto);
-      const updatedProduct = queryRunner.manager.findOneBy(Product, { id });
+      const updatedProduct = await queryRunner.manager.findOne(Product, {
+        where: { id },
+        relations: ['deals'],
+      });
+      // queryRunner.manager.findOneBy(Product, { id });
       await queryRunner.commitTransaction();
       return updatedProduct;
     } catch (err) {
+      console.log(err);
+
       await queryRunner.rollbackTransaction();
       throw err;
     }

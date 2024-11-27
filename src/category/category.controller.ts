@@ -17,12 +17,16 @@ import { Roles } from 'src/role.decorator';
 import { UserRole } from 'src/auth/entities/user.entity';
 import { Public } from 'src/public.decorator';
 import { ProductService } from 'src/product/product.service';
+import { Product } from 'src/product/entities/product.entity';
+import { In, IsNull, Not, Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Controller('categories')
 export class CategoryController {
   constructor(
     private readonly categoryService: CategoryService,
-    private readonly productService: ProductService,
+    @InjectRepository(Product)
+    private productsRepository: Repository<Product>,
   ) {}
   @Post()
   @Roles(UserRole.ADMIN)
@@ -30,17 +34,30 @@ export class CategoryController {
     @Body(ValidationPipe) createCategoryDto: CreateCategoryDto,
   ) {
     if (createCategoryDto.productIds) {
-      const products = await this.productService.findAll();
-      products.forEach((product) => {
-        if (
-          createCategoryDto.productIds.includes(product.id) &&
-          product.category !== null
-        ) {
-          throw new ConflictException(
-            `Product ${product.name} already exist in another category`,
-          );
-        }
+      // const products = await this.productService.findAll();
+      // products.forEach((product) => {
+      //   if (
+      //     createCategoryDto.productIds.includes(product.id) &&
+      //     product.category !== null
+      //   ) {
+      //     throw new ConflictException(
+      //       `Product ${product.name} already exist in another category`,
+      //     );
+      //   }
+      // });
+      const productExistInDiffCat = await this.productsRepository.findOne({
+        where: {
+          id: In(createCategoryDto.productIds),
+          category: Not(IsNull()),
+        },
+        relations: ['category'],
       });
+
+      if (productExistInDiffCat) {
+        throw new ConflictException(
+          `Product ${productExistInDiffCat.name} already exist in another category`,
+        );
+      }
     }
     const createdCategory =
       await this.categoryService.create(createCategoryDto);

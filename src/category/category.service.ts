@@ -9,10 +9,12 @@ import { In, Repository } from 'typeorm';
 import { Category } from './entities/category.entity';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
+import { ProductService } from 'src/product/product.service';
 
 @Injectable()
 export class CategoryService {
   constructor(
+    private readonly productService: ProductService,
     @InjectRepository(Product)
     private productsRepository: Repository<Product>,
     @InjectRepository(Category)
@@ -25,7 +27,7 @@ export class CategoryService {
     queryRunner.startTransaction();
     try {
       // Fetch products by IDs
-      if (createCategoryDto.productIds) {
+      if (createCategoryDto.productIds.length > 0) {
         const products = await queryRunner.manager.findBy(Product, {
           id: In(createCategoryDto.productIds),
         });
@@ -40,8 +42,10 @@ export class CategoryService {
           ...createCategoryDto,
           products: products, // Associate products with the category
         });
-
-        return queryRunner.manager.save(category);
+        const savedProduct = await queryRunner.manager.save(category);
+        await queryRunner.commitTransaction();
+        return savedProduct;
+        // return queryRunner.manager.save(category);
       } else {
         const category = queryRunner.manager.create(Category, {
           ...createCategoryDto,
@@ -79,7 +83,6 @@ export class CategoryService {
         });
 
         products.forEach((product) => {
-          console.log(product);
           if (product?.category !== null && product?.category?.id !== id) {
             throw new ConflictException(
               `Product ${product.name} already exist in another category`,
@@ -118,6 +121,13 @@ export class CategoryService {
   async getCategories() {
     const categories = await this.categoriesRepository.find({
       relations: ['products'],
+      select: {
+        products: {
+          isActive: true,
+          name: true,
+          id: true,
+        },
+      },
     });
     return categories;
   }
@@ -135,6 +145,10 @@ export class CategoryService {
       this.categoriesRepository.manager.connection.createQueryRunner();
     queryRunner.startTransaction();
     try {
+      const product = await this.productsRepository.findOne({
+        relations: ['category'],
+        where: { category: { id } },
+      });
       const result = await queryRunner.manager.delete(Category, { id });
       if (result.affected == 0) {
         throw new NotFoundException('Category not found');

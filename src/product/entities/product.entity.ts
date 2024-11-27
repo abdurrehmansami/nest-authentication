@@ -31,6 +31,7 @@ export class Product {
 
   @ManyToOne(() => Category, (category) => category.products, {
     nullable: true,
+    onDelete: 'SET NULL', // This will keep products but set their category to null when the category is deleted
   })
   @JoinColumn({ name: 'category_id' })
   category: Category;
