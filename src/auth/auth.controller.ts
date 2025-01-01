@@ -64,7 +64,7 @@ export class AuthController {
   }
   @Get('getHello')
   async getHello(@Headers() headers) {
-    console.log('HEADERS', headers);
+    // console.log('HEADERS', headers);
 
     return this.appService.getHello();
   }
