@@ -14,6 +14,7 @@ import { Order } from 'src/order/entities/order.entity';
 import { OrderProduct } from 'src/orderProduct/entities/orderPrdouct.entity';
 import { Category } from '../../category/entities/category.entity';
 import { Deal } from 'src/deal/entities/deal.entity';
+import { Media } from 'src/media/entities/media.entity';
 
 @Entity()
 export class Product {
@@ -38,6 +39,16 @@ export class Product {
 
   @Column({ default: true })
   isActive: boolean;
+
+  //  @ManyToOne(() => Media, (media) => media.products, {
+  //   nullable: true,
+  //   onDelete: 'SET NULL', // When media is deleted, set product's media to null
+  // })
+  // @JoinColumn({ name: 'product_media_id' })
+  // image: Media;
+
+   @OneToMany(() => Media, (media) => media.product, { cascade: true })
+  images: Media[];
 
   @ManyToMany(() => Deal, (deal) => deal.products, { nullable: true })
   deals: Deal[];

@@ -7,6 +7,7 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { Category } from '../category/entities/category.entity';
 import { Deal } from 'src/deal/entities/deal.entity';
 import { Public } from 'src/public.decorator';
+import { Media } from 'src/media/entities/media.entity';
 
 @Injectable()
 export class ProductService {
@@ -24,7 +25,11 @@ export class ProductService {
       this.productsRepository.manager.connection.createQueryRunner();
     await queryRunner.startTransaction();
     try {
-      const product = queryRunner.manager.create(Product, createProductDto);
+      const product = queryRunner.manager.create(Product, {
+      name: createProductDto.name,
+      price: createProductDto.price,
+      description: createProductDto.description,
+    });
       if (createProductDto.categoryId) {
         const category = await queryRunner.manager.findOne(Category, {
           where: { id: createProductDto.categoryId },
@@ -32,12 +37,19 @@ export class ProductService {
         if (!category) {
           throw new NotFoundException('Category doesnot exist');
         }
-        // console.log(category);
-
-        // category.products.push(product);
-        // await queryRunner.manager.save(Category, category);
         product.category = category;
       }
+        // Attach media entities (will be automatically saved via cascade)
+    if (createProductDto.images && createProductDto.images.length > 0) {
+      product.images = createProductDto.images.map((mediaDto) =>
+        queryRunner.manager.create(Media, {
+          title: mediaDto.title,
+          name: mediaDto.name,
+          mimetype: mediaDto.mimetype,
+          path: mediaDto.path,
+        }),
+      );
+    }
       const savedProduct = await queryRunner.manager.save(Product, product);
       await queryRunner.commitTransaction();
       return savedProduct;
