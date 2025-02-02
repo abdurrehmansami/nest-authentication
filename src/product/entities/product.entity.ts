@@ -11,7 +11,7 @@ import {
 import { User } from 'src/auth/entities/user.entity'; // Assuming you have a User entity
 import { IsNotEmpty, IsNumber, IsPositive } from 'class-validator';
 import { Order } from 'src/order/entities/order.entity';
-import { OrderProduct } from 'src/orderProduct/entities/orderPrdouct.entity';
+import { OrderProduct } from 'src/orderProduct/entities/orderProduct.entity';
 import { Category } from '../../category/entities/category.entity';
 import { Deal } from 'src/deal/entities/deal.entity';
 import { Media } from 'src/media/entities/media.entity';

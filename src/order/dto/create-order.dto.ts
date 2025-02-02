@@ -15,7 +15,7 @@ import { User } from 'src/auth/entities/user.entity';
 import { Product } from 'src/product/entities/product.entity';
 import { Order } from '../entities/order.entity';
 import { UserDto } from 'src/auth/dto/user.dto';
-import { OrderProduct } from 'src/orderProduct/entities/orderPrdouct.entity';
+import { OrderProduct } from 'src/orderProduct/entities/orderProduct.entity';
 
 class OrderProductDto {
   @IsNumber()

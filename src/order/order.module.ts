@@ -8,7 +8,7 @@ import { Category } from 'src/category/entities/category.entity';
 import { Order } from './entities/order.entity';
 import { OrderService } from './order.service';
 import { OrderController } from './order.controller';
-import { OrderProduct } from 'src/orderProduct/entities/orderPrdouct.entity';
+import { OrderProduct } from 'src/orderProduct/entities/orderProduct.entity';
 import { User } from 'src/auth/entities/user.entity';
 import { AuthService } from 'src/auth/auth.service';
 import { JwtService } from '@nestjs/jwt';

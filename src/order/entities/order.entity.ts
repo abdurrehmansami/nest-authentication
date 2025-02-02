@@ -7,7 +7,7 @@ import {
   OneToMany,
 } from 'typeorm';
 import { User } from 'src/auth/entities/user.entity'; // Assuming you have a User entity
-import { OrderProduct } from 'src/orderProduct/entities/orderPrdouct.entity';
+import { OrderProduct } from 'src/orderProduct/entities/orderProduct.entity';
 
 @Entity()
 export class Order {

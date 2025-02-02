@@ -6,7 +6,7 @@ import {
 import { Order } from './entities/order.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { OrderProduct } from 'src/orderProduct/entities/orderPrdouct.entity';
+import { OrderProduct } from 'src/orderProduct/entities/orderProduct.entity';
 import { CreateOrderDto, OrderDto } from './dto/create-order.dto';
 import { Product } from 'src/product/entities/product.entity';
 import { User } from 'src/auth/entities/user.entity';
