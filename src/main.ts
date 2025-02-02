@@ -12,6 +12,7 @@ import { JwtAuthGuard } from './jwt-auth.guard';
 // }
 // bootstrap();
 async function bootstrap() {
+    try {
   const app = await NestFactory.create(AppModule);
   app.enableCors({
     origin: '*', // or '*' for all domains
@@ -20,5 +21,9 @@ async function bootstrap() {
   app.use(cookieParser());
   app.setGlobalPrefix('api/v1');
   await app.listen(process.env.PORT || 3001);
+   console.log('Application is running on:', await app.getUrl(), '--',process.env.PORT);
+  } catch (error) {
+    console.error('Error during application startup:', error);
+  }
 }
 bootstrap();
