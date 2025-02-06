@@ -13,6 +13,9 @@ import { MediaModule } from './media/media.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AppService } from './app.service';
 import { AppController } from './app.controller';
+import { FileUploadModule } from './file-upload/file-upload.module';
+import { FileUploadController } from './file-upload/file-upload.controller';
+import { FileUploadService } from './file-upload/file-upload.service';
 // @Module({
 //   imports: [
 //     TypeOrmModule.forRoot({
@@ -64,10 +67,12 @@ import { AppController } from './app.controller';
     CategoryModule,
     OrderModule,
     MediaModule,
+    FileUploadModule,
   ],
-  controllers:[AppController],
+  controllers:[AppController, FileUploadController],
   providers: [
      AppService,
+     FileUploadService,
     { provide: APP_GUARD, useClass: JwtAuthGuard },
     { provide: APP_GUARD, useClass: RolesGuard },
     {
